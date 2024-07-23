@@ -1,7 +1,7 @@
 "use client";
 
-import { ApiAlert } from "@/components/api-alert";
 import Heading from "@/components/heading";
+import ImageUpload from "@/components/image-upload";
 import { AlertModal } from "@/components/modal/alert-modal";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import useOrigin from "@/hooks/use-origin";
-import { Store } from "@/types-db";
+import { Billboards } from "@/types-db";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { Trash } from "lucide-react";
@@ -25,17 +25,16 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 
-interface SettingFormProps {
-  initialData: Store;
+interface BillboardFormProps {
+  initialData: Billboards;
 }
 
 const formSchema = z.object({
-  name: z
-    .string()
-    .min(3, { message: "Store name should be minimum 3 characters" }),
+  label: z.string().min(1),
+  imageUrl: z.string().min(1),
 });
 
-export default function SettingForm({ initialData }: SettingFormProps) {
+export default function BillboardForm({ initialData }: BillboardFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData,
@@ -45,7 +44,11 @@ export default function SettingForm({ initialData }: SettingFormProps) {
   const [open, setOpen] = useState(false);
   const params = useParams();
   const router = useRouter();
-  const origin = useOrigin();
+
+  const title = initialData ? "Edit Billboard" : "Create Billboard";
+  const description = initialData ? "Edit a billboard" : "Add a neww billboard";
+  const toastMessage = initialData ? "Billboard Updated" : "Billboard Created";
+  const action = initialData ? "Save Changes" : "Create Billboard";
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
@@ -84,14 +87,17 @@ export default function SettingForm({ initialData }: SettingFormProps) {
         loading={isLoading}
       />
       <div className="flex items-center justify-center">
-        <Heading title="Settings" description="Manage Store Preferences" />
-        <Button
-          variant={"destructive"}
-          size={"icon"}
-          onClick={() => setOpen(true)}
-        >
-          <Trash className="w-4 h-4" />
-        </Button>
+        <Heading title={title} description={description} />
+        {initialData && (
+          <Button
+            disabled={isLoading}
+            variant={"destructive"}
+            size={"icon"}
+            onClick={() => setOpen(true)}
+          >
+            <Trash className="w-4 h-4" />
+          </Button>
+        )}
       </div>
       <Separator />
       <Form {...form}>
@@ -99,17 +105,38 @@ export default function SettingForm({ initialData }: SettingFormProps) {
           onSubmit={form.handleSubmit(onSubmit)}
           className="w-full space-y-8"
         >
+          <FormField
+            control={form.control}
+            name="imageUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Billboard Image</FormLabel>
+                <FormControl>
+                  <ImageUpload
+                    value={field.value ? [field.value] : []}
+                    disabled={isLoading}
+                    onChange={(url) => {
+                      field.onChange(url);
+                    }}
+                    onRemove={() => field.onChange("")}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <div className="grid grid-cols-3 gap-8">
             <FormField
               control={form.control}
-              name="name"
+              name="label"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input
                       disabled={isLoading}
-                      placeholder="Your Store Name"
+                      placeholder="Your billboard Name"
                       {...field}
                     />
                   </FormControl>
@@ -124,12 +151,6 @@ export default function SettingForm({ initialData }: SettingFormProps) {
           </Button>
         </form>
       </Form>
-      <Separator />
-      <ApiAlert
-        title="NEXT_PUBLIC_API_URL"
-        description={`${origin}/api/${params.storeId}`}
-        variant="public"
-      />
     </>
   );
 }
