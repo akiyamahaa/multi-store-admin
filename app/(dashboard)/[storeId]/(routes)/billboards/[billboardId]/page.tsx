@@ -16,9 +16,8 @@ export default async function BillboardPage({
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
-        <BillboardForm initialData={billboard} />
+        <BillboardForm initialData={structuredClone(billboard)} />
       </div>
-      This is billboard page :{params.billboardId}
     </div>
   );
 }

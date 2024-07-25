@@ -15,9 +15,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import useOrigin from "@/hooks/use-origin";
+import { storage } from "@/lib/firebase";
 import { Billboards } from "@/types-db";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
+import { deleteObject, ref } from "firebase/storage";
 import { Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -53,9 +55,18 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       setIsLoading(true);
-      const response = await axios.patch(`/api/stores/${params.storeId}`, data);
-      toast.success("Store Created");
+
+      if (initialData) {
+        await axios.patch(
+          `/api/${params.storeId}/billboards/${params.billboardId}`,
+          data
+        );
+      } else {
+        await axios.post(`/api/${params.storeId}/billboards`, data);
+      }
+      toast.success(toastMessage);
       router.refresh();
+      router.push(`/${params.storeId}/billboards`);
     } catch (error) {
       toast.error("Something went wrong");
     } finally {
@@ -66,13 +77,19 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
   const onDelete = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.delete(`/api/stores/${params.storeId}`);
-      toast.success("Store Removed");
+      const { imageUrl } = form.getValues();
+      await deleteObject(ref(storage, imageUrl)).then(async () => {
+        await axios.delete(
+          `/api/${params.storeId}/billboards/${params.billboardId}`
+        );
+      });
+      toast.success("Billboard Removed");
       router.refresh();
-      router.push("/");
+      router.push(`/${params.storeId}/billboards`);
     } catch (error) {
       toast.error("Something went wrong");
     } finally {
+      router.refresh();
       setIsLoading(false);
       setOpen(false);
     }

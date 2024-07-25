@@ -1,11 +1,18 @@
 "use client";
 
 import { storage } from "@/lib/firebase";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { ImagePlus } from "lucide-react";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { ImagePlus, Trash } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { PuffLoader } from "react-spinners";
+import { Button } from "@/components/ui/button";
 interface ImageUploadProps {
   disabled?: boolean;
   onChange: (value: string) => void;
@@ -32,11 +39,11 @@ export default function ImageUpload({
   }
 
   const onUpload = async (e: any) => {
-    const file = e.target.file[0];
+    const file = e.target.files[0];
     setIsLoading(true);
 
     const uploadTask = uploadBytesResumable(
-      ref(storage, `Image/${Date.now()}-${file.name}`),
+      ref(storage, `Images/${Date.now()}-${file.name}`),
       file,
       { contentType: file.type }
     );
@@ -57,12 +64,45 @@ export default function ImageUpload({
     );
   };
 
+  const onDelete = (url: string) => {
+    onRemove(url);
+    deleteObject(ref(storage, url)).then(() => {
+      toast.success("Image Removed");
+    });
+  };
+
   return (
     <div>
       {value && value.length > 0 ? (
-        <></>
+        <>
+          <div className="mb-4 flex items-center gap-4">
+            {value.map((url) => (
+              <div
+                className="relative w-52 h-52 rounded-md overflow-hidden"
+                key={url}
+              >
+                <Image
+                  fill
+                  className="object-cover"
+                  alt="Billboard Image"
+                  src={url}
+                />
+                <div className="absolute z-10 top-2 right-2">
+                  <Button
+                    type="button"
+                    onClick={() => onDelete(url)}
+                    variant={"destructive"}
+                    size={"icon"}
+                  >
+                    <Trash className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       ) : (
-        <div className="w-52 h-52 rounded-md overflow-hidden border-dashed border-gray-200 flex items-center justify-center flex-col gap-3">
+        <div className="w-52 h-52 rounded-md overflow-hidden border border-dashed border-gray-200 flex items-center justify-center flex-col gap-3">
           {isLoading ? (
             <>
               <PuffLoader size={30} color="#555" />
@@ -75,7 +115,12 @@ export default function ImageUpload({
                   <ImagePlus className="h-4 w-4" />
                   <p>Upload an image</p>
                 </div>
-                <input type="file" accept="image/*" className="h-0 w-0" />
+                <input
+                  type="file"
+                  onChange={onUpload}
+                  accept="image/*"
+                  className="h-0 w-0"
+                />
               </label>
             </>
           )}
