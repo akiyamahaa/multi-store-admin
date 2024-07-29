@@ -21,12 +21,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import useOrigin from "@/hooks/use-origin";
-import { storage } from "@/lib/firebase";
 import { Billboards, Category } from "@/types-db";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { deleteObject, ref } from "firebase/storage";
 import { Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -67,21 +64,31 @@ export default function CategoryForm({
     try {
       setIsLoading(true);
 
+      const { billboardId: formBillId } = form.getValues();
+      const matchingBillboard = billboards.find(
+        (item) => item.id == formBillId
+      );
       if (initialData) {
         await axios.patch(
           `/api/${params.storeId}/categories/${params.categoryId}`,
-          data
+          {
+            ...data,
+            billboardLabel: matchingBillboard?.label,
+          }
         );
       } else {
-        await axios.post(`/api/${params.storeId}/categories`, data);
+        await axios.post(`/api/${params.storeId}/categories`, {
+          ...data,
+          billboardLabel: matchingBillboard?.label,
+        });
       }
       toast.success(toastMessage);
-      router.refresh();
       router.push(`/${params.storeId}/categories`);
     } catch (error) {
       toast.error("Something went wrong");
     } finally {
       setIsLoading(false);
+      router.refresh();
     }
   };
 

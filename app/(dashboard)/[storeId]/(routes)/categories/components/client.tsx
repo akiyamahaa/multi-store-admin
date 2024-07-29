@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Plus } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { CategoryColumns, columns } from "./columns";
+import ApiList from "@/components/api-list";
 
 interface CategoryClientProps {
   data: CategoryColumns[];
@@ -30,6 +31,10 @@ export default function CategoryClient({ data }: CategoryClientProps) {
       </div>
       <Separator />
       <DataTable searchKey="name" columns={columns} data={data} />
+
+      <Heading title="API" description="API calls for categories" />
+      <Separator />
+      <ApiList entityName="categories" entityNameId="categoryId" />
     </>
   );
 }

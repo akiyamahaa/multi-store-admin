@@ -12,8 +12,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Copy, Edit, MoreVertical, Trash } from "lucide-react";
 import toast from "react-hot-toast";
-import { deleteObject, ref } from "firebase/storage";
-import { storage } from "@/lib/firebase";
 import axios from "axios";
 import { AlertModal } from "@/components/modal/alert-modal";
 import { CategoryColumns } from "./columns";
@@ -30,25 +28,24 @@ export default function CellAction({ data }: CellActionProps) {
 
   const onCopy = (id: string) => {
     navigator.clipboard.writeText(id);
-    toast.success("Billbiard id copied to clipboard");
+    toast.success("Category id copied to clipboard");
   };
 
   const onDelete = async () => {
-    // try {
-    //   setIsLoading(true);
-    //   await deleteObject(ref(storage, data.imageUrl)).then(async () => {
-    //     await axios.delete(`/api/${params.storeId}/billboards/${data.id}`);
-    //   });
-    //   router.refresh();
-    //   router.push(`/${params.storeId}/billboards`);
-    //   toast.success("Billboard Removed");
-    // } catch (error) {
-    //   toast.error("Something went wrong");
-    // } finally {
-    //   router.refresh();
-    //   setIsLoading(false);
-    //   setOpen(false);
-    // }
+    try {
+      setIsLoading(true);
+      await axios.delete(`/api/${params.storeId}/categories/${data.id}`);
+      toast.success("Category Removed");
+      router.refresh();
+      // location.reload()
+      router.push(`/${params.storeId}/categories`);
+    } catch (error) {
+      toast.error("Something went wrong");
+    } finally {
+      router.refresh();
+      setIsLoading(false);
+      setOpen(false);
+    }
   };
 
   return (
@@ -75,7 +72,7 @@ export default function CellAction({ data }: CellActionProps) {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() =>
-              router.push(`/${params.storeId}/billboards/${data.id}`)
+              router.push(`/${params.storeId}/categories/${data.id}`)
             }
           >
             <Edit className="h-4 w-4 mr-2" />
