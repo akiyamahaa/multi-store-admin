@@ -29,23 +29,40 @@ export interface Size {
   id: string;
   name: string;
   value: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
 }
 
 export interface Kitchen {
   id: string;
   name: string;
   value: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
 }
-
 
 export interface Cuisine {
   id: string;
   name: string;
   value: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  price: number;
+  qty?: number;
+  images: {
+    url: string;
+  }[];
+  isFeatured: boolean;
+  isArchived: boolean;
+  category: string;
+  kitchen: string;
+  size: string;
+  cuisine: string;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
 }

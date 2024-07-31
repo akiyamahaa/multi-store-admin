@@ -1,5 +1,5 @@
 import { db } from "@/lib/firebase";
-import { Cuisine, Kitchen } from "@/types-db";
+import { Cuisine } from "@/types-db";
 import { auth } from "@clerk/nextjs/server";
 import {
   deleteDoc,
@@ -86,7 +86,7 @@ export const DELETE = async (
       return new NextResponse("Store Id is missing", { status: 400 });
     }
     if (!params.cuisineId) {
-      return new NextResponse("Kitchen Id is missing", { status: 400 });
+      return new NextResponse("Cuisine Id is missing", { status: 400 });
     }
 
     const store = await getDoc(doc(db, "stores", params.storeId));
