@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 import CellAction from "./cell-actions";
 import CellImage from "./cell-image";
+import { cn } from "@/lib/utils";
 
 export type OrderColumns = {
   id: string;
@@ -29,6 +30,10 @@ export const columns: ColumnDef<OrderColumns>[] = [
     ),
   },
   {
+    accessorKey: "products",
+    header: "Products",
+  },
+  {
     accessorKey: "phone",
     header: "Phone",
   },
@@ -41,28 +46,43 @@ export const columns: ColumnDef<OrderColumns>[] = [
     header: "Amount",
   },
   {
-    accessorKey: "isPaid",
-    header: "Payment Status",
-  },
-  {
-    accessorKey: "products",
-    header: "Products",
-  },
-  {
-    accessorKey: "value",
-    header: ({ column }) => {
+    accessorKey: "order_status",
+    header: "status",
+    cell: ({ row }) => {
+      const { order_status } = row.original;
+
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        <p
+          className={cn(
+            "text-base font-semibold",
+            (order_status === "Delivering" && "text-yellow-500") ||
+              (order_status === "Processing" && "text-orange-500") ||
+              (order_status === "Delivered" && "text-emerald-500") ||
+              (order_status === "Canceled" && "text-red-500")
+          )}
         >
-          Value
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+          {order_status}
+        </p>
       );
     },
   },
-
+  {
+    accessorKey: "isPaid",
+    header: "Payment Status",
+    cell: ({ row }) => {
+      const { isPaid } = row.original;
+      return (
+        <p
+          className={cn(
+            "text-lg font-semibold",
+            isPaid ? "text-emerald-500" : "text-red-500"
+          )}
+        >
+          {isPaid ? "Paid" : "Not Paid"}
+        </p>
+      );
+    },
+  },
   {
     accessorKey: "createdAt",
     header: ({ column }) => {

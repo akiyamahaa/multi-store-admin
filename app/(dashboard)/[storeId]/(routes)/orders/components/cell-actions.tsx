@@ -14,10 +14,10 @@ import { Copy, Edit, MoreVertical, Trash } from "lucide-react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { AlertModal } from "@/components/modal/alert-modal";
-import { SizeColumns } from "./columns";
+import { OrderColumns } from "./columns";
 
 interface CellActionProps {
-  data: SizeColumns;
+  data: OrderColumns;
 }
 
 export default function CellAction({ data }: CellActionProps) {
@@ -28,22 +28,37 @@ export default function CellAction({ data }: CellActionProps) {
 
   const onCopy = (id: string) => {
     navigator.clipboard.writeText(id);
-    toast.success("Size id copied to clipboard");
+    toast.success("Order id copied to clipboard");
   };
 
   const onDelete = async () => {
     try {
       setIsLoading(true);
-      await axios.delete(`/api/${params.storeId}/sizes/${data.id}`);
-      toast.success("Size Removed");
+      await axios.delete(`/api/${params.storeId}/orders/${data.id}`);
+      toast.success("Order Removed");
       router.refresh();
-      router.push(`/${params.storeId}/sizes`);
+      router.push(`/${params.storeId}/orders`);
     } catch (error) {
       toast.error("Something went wrong");
     } finally {
       router.refresh();
       setIsLoading(false);
       setOpen(false);
+    }
+  };
+
+  const onUpdate = async (data: any) => {
+    try {
+      setIsLoading(true);
+      await axios.patch(`/api/${params.storeId}/orders/${data.id}`, data);
+      location.reload();
+      router.push(`/${params.storeId}/orders`);
+      toast.success("Order Updated");
+    } catch (error) {
+      toast.error("Something went wrong");
+    } finally {
+      router.refresh();
+      setIsLoading(false);
     }
   };
 
@@ -65,15 +80,57 @@ export default function CellAction({ data }: CellActionProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => onCopy(data.id)}>
+          {/* <DropdownMenuItem onClick={() => onCopy(data.id)}>
             <Copy className="h-4 w-4 mr-2" />
             Copy Id
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
           <DropdownMenuItem
-            onClick={() => router.push(`/${params.storeId}/sizes/${data.id}`)}
+            onClick={() =>
+              onUpdate({
+                id: data.id,
+                order_status: data.order_status,
+                isPaid: true,
+              })
+            }
           >
             <Edit className="h-4 w-4 mr-2" />
-            Update
+            Paid
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() =>
+              onUpdate({
+                id: data.id,
+                order_status: "Delivering",
+                isPaid: data.isPaid,
+              })
+            }
+          >
+            <Edit className="h-4 w-4 mr-2" />
+            Delivering
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() =>
+              onUpdate({
+                id: data.id,
+                isPaid: data.isPaid,
+                order_status: "Delivered",
+              })
+            }
+          >
+            <Edit className="h-4 w-4 mr-2" />
+            Delivered
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() =>
+              onUpdate({
+                id: data.id,
+                isPaid: data.isPaid,
+                order_status: "Canceled",
+              })
+            }
+          >
+            <Edit className="h-4 w-4 mr-2" />
+            Canceled
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setOpen(true)}>
             <Trash className="h-4 w-4 mr-2" />

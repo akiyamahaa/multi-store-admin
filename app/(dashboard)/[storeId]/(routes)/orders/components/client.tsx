@@ -1,10 +1,8 @@
 "use client";
 
 import Heading from "@/components/heading";
-import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { Separator } from "@/components/ui/separator";
-import { Plus } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { OrderColumns, columns } from "./columns";
 
@@ -24,8 +22,7 @@ export default function OrderClient({ data }: OrderClientProps) {
         />
       </div>
       <Separator />
-      <DataTable searchKey="name" columns={columns} data={data} />
-
+      <DataTable searchKey="products" columns={columns} data={data} />
     </>
   );
 }
