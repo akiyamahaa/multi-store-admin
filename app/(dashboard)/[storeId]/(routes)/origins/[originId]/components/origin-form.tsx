@@ -1,6 +1,5 @@
 "use client";
 
-import { ApiAlert } from "@/components/api-alert";
 import Heading from "@/components/heading";
 import { AlertModal } from "@/components/modal/alert-modal";
 import { Button } from "@/components/ui/button";
@@ -14,8 +13,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import useOrigin from "@/hooks/use-origin";
-import { Store } from "@/types-db";
+import { Origin } from "@/types-db";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { Trash } from "lucide-react";
@@ -25,17 +24,16 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 
-interface SettingFormProps {
-  initialData: Store;
+interface OriginFormProps {
+  initialData: Origin;
 }
 
 const formSchema = z.object({
-  name: z
-    .string()
-    .min(3, { message: "Store name should be minimum 3 characters" }),
+  name: z.string().min(1),
+  value: z.string().min(1),
 });
 
-export default function SettingForm({ initialData }: SettingFormProps) {
+export default function OriginForm({ initialData }: OriginFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData,
@@ -45,31 +43,45 @@ export default function SettingForm({ initialData }: SettingFormProps) {
   const [open, setOpen] = useState(false);
   const params = useParams();
   const router = useRouter();
-  const origin = useOrigin();
+
+  const title = initialData ? "Edit Origin" : "Create Origin";
+  const description = initialData ? "Edit a Origin" : "Add a new Origin";
+  const toastMessage = initialData ? "Origin Updated" : "Origin Created";
+  const action = initialData ? "Save Changes" : "Create Origin";
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       setIsLoading(true);
-      const response = await axios.patch(`/api/stores/${params.storeId}`, data);
-      toast.success("Store Created");
-      router.refresh();
+
+      if (initialData) {
+        await axios.patch(
+          `/api/${params.storeId}/origins/${params.originId}`,
+          data
+        );
+      } else {
+        await axios.post(`/api/${params.storeId}/origins`, data);
+      }
+      toast.success(toastMessage);
+      router.push(`/${params.storeId}/origins`);
     } catch (error) {
       toast.error("Something went wrong");
     } finally {
       setIsLoading(false);
+      router.refresh();
     }
   };
 
   const onDelete = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.delete(`/api/stores/${params.storeId}`);
-      toast.success("Store Removed");
+      await axios.delete(`/api/${params.storeId}/origins/${params.originId}`);
+      toast.success("Origin Removed");
       router.refresh();
-      router.push("/");
+      router.push(`/${params.storeId}/origins`);
     } catch (error) {
       toast.error("Something went wrong");
     } finally {
+      router.refresh();
       setIsLoading(false);
       setOpen(false);
     }
@@ -84,14 +96,17 @@ export default function SettingForm({ initialData }: SettingFormProps) {
         loading={isLoading}
       />
       <div className="flex items-center justify-center">
-        <Heading title="Settings" description="Manage Store Preferences" />
-        <Button
-          variant={"destructive"}
-          size={"icon"}
-          onClick={() => setOpen(true)}
-        >
-          <Trash className="w-4 h-4" />
-        </Button>
+        <Heading title={title} description={description} />
+        {initialData && (
+          <Button
+            disabled={isLoading}
+            variant={"destructive"}
+            size={"icon"}
+            onClick={() => setOpen(true)}
+          >
+            <Trash className="w-4 h-4" />
+          </Button>
+        )}
       </div>
       <Separator />
       <Form {...form}>
@@ -109,7 +124,24 @@ export default function SettingForm({ initialData }: SettingFormProps) {
                   <FormControl>
                     <Input
                       disabled={isLoading}
-                      placeholder="Your Store Name"
+                      placeholder="Your Origin name"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="value"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Value</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={isLoading}
+                      placeholder="Your Origin value"
                       {...field}
                     />
                   </FormControl>
@@ -124,12 +156,6 @@ export default function SettingForm({ initialData }: SettingFormProps) {
           </Button>
         </form>
       </Form>
-      {/* <Separator />
-      <ApiAlert
-        title="NEXT_PUBLIC_API_URL"
-        description={`${origin}/api/${params.storeId}`}
-        variant="public"
-      /> */}
     </>
   );
 }

@@ -1,5 +1,5 @@
 import { db } from "@/lib/firebase";
-import { Category, Cuisine, Kitchen, Product, Size } from "@/types-db";
+import { Category, Cuisine, Origin, Product, Size } from "@/types-db";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import ProductForm from "./components/product-form";
 
@@ -18,9 +18,9 @@ export default async function ProductPage({
     await getDocs(collection(doc(db, "stores", params.storeId), "categories"))
   ).docs.map((doc) => doc.data()) as Category[];
 
-  const kitchens = (
-    await getDocs(collection(doc(db, "stores", params.storeId), "kitchens"))
-  ).docs.map((doc) => doc.data()) as Kitchen[];
+  const origins = (
+    await getDocs(collection(doc(db, "stores", params.storeId), "origins"))
+  ).docs.map((doc) => doc.data()) as Origin[];
   const sizes = (
     await getDocs(collection(doc(db, "stores", params.storeId), "sizes"))
   ).docs.map((doc) => doc.data()) as Size[];
@@ -36,7 +36,7 @@ export default async function ProductPage({
           initialData={structuredClone(product)}
           categories={structuredClone(categories)}
           cuisines={structuredClone(cuisines)}
-          kitchens={structuredClone(kitchens)}
+          origins={structuredClone(origins)}
           sizes={structuredClone(sizes)}
         />
       </div>

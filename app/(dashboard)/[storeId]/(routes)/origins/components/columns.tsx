@@ -5,24 +5,14 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 import CellAction from "./cell-actions";
 
-export type ProductColumns = {
+export type OriginColumns = {
   id: string;
   name: string;
-  price: string;
-  qty?: number;
-  images: {
-    url: string;
-  }[];
-  isFeatured: boolean;
-  isArchived: boolean;
-  category: string;
-  origin: string;
-  size: string;
-  cuisine: string;
-  createdAt?: string;
+  value: string;
+  createdAt: string;
 };
 
-export const columns: ColumnDef<ProductColumns>[] = [
+export const columns: ColumnDef<OriginColumns>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -31,40 +21,26 @@ export const columns: ColumnDef<ProductColumns>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Name
+         Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
   },
   {
-    accessorKey: "price",
-    header:"Price"
+    accessorKey: "value",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Value
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
   },
-  {
-    accessorKey: "isFeatured",
-    header:"Featured"
-  },
-  {
-    accessorKey: "isArchived",
-    header:"Archived"
-  },
-  {
-    accessorKey: "category",
-    header:"Category"
-  },
-  {
-    accessorKey: "origin",
-    header:"Origin"
-  },
-  {
-    accessorKey: "size",
-    header:"Size"
-  },
-  // {
-  //   accessorKey: "cuisine",
-  //   header:"Cuisine"
-  // },
 
   {
     accessorKey: "createdAt",

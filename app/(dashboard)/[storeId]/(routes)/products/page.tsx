@@ -22,7 +22,7 @@ export default async function ProductsPage({
     isFeatured: item.isFeatured,
     isArchived: item.isArchived,
     category: item.category,
-    kitchen: item.kitchen,
+    origin: item.origin,
     cuisine: item.cuisine,
     size: item.size,
     images: item.images,
