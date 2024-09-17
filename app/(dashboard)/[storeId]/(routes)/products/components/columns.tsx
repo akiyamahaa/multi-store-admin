@@ -18,7 +18,7 @@ export type ProductColumns = {
   category: string;
   origin: string;
   size: string;
-  cuisine: string;
+  // cuisine: string;
   createdAt?: string;
 };
 

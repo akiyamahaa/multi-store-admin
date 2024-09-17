@@ -25,9 +25,9 @@ export default async function ProductPage({
     await getDocs(collection(doc(db, "stores", params.storeId), "sizes"))
   ).docs.map((doc) => doc.data()) as Size[];
 
-  const cuisines = (
-    await getDocs(collection(doc(db, "stores", params.storeId), "cuisines"))
-  ).docs.map((doc) => doc.data()) as Cuisine[];
+  // const cuisines = (
+  //   await getDocs(collection(doc(db, "stores", params.storeId), "cuisines"))
+  // ).docs.map((doc) => doc.data()) as Cuisine[];
 
   return (
     <div className="flex-col">
@@ -35,7 +35,7 @@ export default async function ProductPage({
         <ProductForm
           initialData={structuredClone(product)}
           categories={structuredClone(categories)}
-          cuisines={structuredClone(cuisines)}
+          // cuisines={structuredClone(cuisines)}
           origins={structuredClone(origins)}
           sizes={structuredClone(sizes)}
         />

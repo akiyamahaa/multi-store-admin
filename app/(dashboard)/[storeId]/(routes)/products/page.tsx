@@ -23,7 +23,7 @@ export default async function ProductsPage({
     isArchived: item.isArchived,
     category: item.category,
     origin: item.origin,
-    cuisine: item.cuisine,
+    // cuisine: item.cuisine,
     size: item.size,
     images: item.images,
     createdAt: item.createdAt
